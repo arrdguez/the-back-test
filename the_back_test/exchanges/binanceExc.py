@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 import json
 import decimal
@@ -192,7 +194,7 @@ class Binance:
                 limitTable['w1'] = int(limitTable['d1']/7)
                 limit = limitTable[interval[::-1]]
             else:
-                logger.error(f'init_time is bigger than end_time. [{init_time}, {end_time}]')
+                self.logger.error(f'init_time is bigger than end_time. [{init_time}, {end_time}]')
 
 
 
@@ -216,7 +218,7 @@ class Binance:
         for col in col_names:
             df[col] = df[col].astype(float)
 
-        df['date'] = pd.to_datetime(df['time'] * 1000000, infer_datetime_format=True)
+        df['date'] = pd.to_datetime(df['time'] * 1000000)
 
         return df
 
@@ -241,30 +243,28 @@ class Binance:
         orderBook = self.GetOrderBook(symbol=symbol, limit=limit)
         df = self._df = pd.DataFrame()
 
-        bids = orderBook['bids']
-        asks = orderBook['asks'].reverse()
 
 
-        priceList = []
-        qtyList = []
+        price_list = []
+        qty_list = []
 
         for x in orderBook['asks']:
-            priceList.append(x[0])
-            qtyList.append(x[1])
+            price_list.append(x[0])
+            qty_list.append(x[1])
 
-        df['bidsPrice'] = priceList
-        df['bidsQty'] = qtyList
+        df['bidsPrice'] = price_list
+        df['bidsQty'] = qty_list
 
 
-        priceList = []
-        qtyList = []
+        price_list = []
+        qty_list = []
 
         for x in orderBook['bids']:
-            priceList.append(x[0])
-            qtyList.append(x[1])
+            price_list.append(x[0])
+            qty_list.append(x[1])
 
-        df['asksPrice'] = priceList
-        df['asksQty'] = qtyList
+        df['asksPrice'] = price_list
+        df['asksQty'] = qty_list
         df = df.astype(float)
 
         return df
@@ -363,12 +363,12 @@ class Binance:
 
         df = self.GetSymbolKlines(symbol, interval, limit, init_time, end_time)
         if export:
-            fileName = "./downloads/"+symbol+'_'+interval+'.csv'
+            fileName = "../plot/"+symbol+'_'+interval+'.csv'
             df.to_csv(fileName)
         return df
 
 
-def Main():
+def main():
 
     logger = structlog.get_logger(__name__)
     exchange = Binance()
@@ -396,4 +396,4 @@ def Main():
 
 
 if __name__ == '__main__':
-    Main()
+    main()

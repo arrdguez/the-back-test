@@ -25,18 +25,15 @@ class Core(object):
     def getData(self, offline:bool=False):
         if offline:
             self.logger.info(f'Offline mode.')
-            self.df = pd.read_csv("./downloads/default_BTCUSDT_4h.csv")
+            self.df = pd.read_csv("./plot/default_BTCUSDT_4h.csv")
         else:
 
             self.df = self.excman.getData(exchange="Binance", symbol="BTCUSDT", interval="4h", export=False)
 
 
-    def taCalc(self, indicators:list=[("ema",10)]):
+    def setupstrategy(self):
 
-        self.techan.getData(self.df)
-
-        #indicators =  indicators+[("supertrend",14,1.5)]
-        self.df = self.techan.TechnicalAnalisis(df = self.df, indicators = indicators)
+        pass
 
 
     def printData(self):
@@ -44,7 +41,7 @@ class Core(object):
 
     def backTesting(self):
         indicators = self.stratman.getStrategyIndicator()
-        self.taCalc(indicators)
+        self.df = self.techan.setup(self.df, indicators)
         self.stratman.strategyCaller(self.df)
         self.opman.defaultOperation(self.df)
 
@@ -60,7 +57,8 @@ class Core(object):
 def main():
     core = Core()
     core.getData()
-    core.taCalc()
+    #print(core.df)
+
 
     core.printData()
     core.backTesting()

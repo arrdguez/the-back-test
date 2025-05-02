@@ -1,7 +1,6 @@
 import pandas as pd
 import structlog
-
-
+from finta import TA
 
 
 class default(object):
@@ -15,6 +14,13 @@ class default(object):
             ("ema",10),
             ("ema",55)
             ]
+
+    def setup(self, oclh:pd)->pd:
+        #logger.info(f"{i[0]} period {i[1]}")
+        self.oclh["ema10"] = TA.SMA(self.df, int(10), "close")
+        self.oclh["ema55"] = TA.SMA(self.df, int(55), "close")
+        return oclh
+
 
 
     def ema_strategy(self, oclh:pd)->pd:
